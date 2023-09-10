@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/DavidHsaiou/dcom/dto"
+	"github.com/DavidHsaiou/dcom/util"
 )
 
 type Route interface {
@@ -25,6 +26,8 @@ type HTTP interface {
 	AddRoute(route Route)
 	Run()
 	Stop()
+
+	util.LifetimeDependency
 }
 
 type Options interface {

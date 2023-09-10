@@ -1,6 +1,7 @@
 package server
 
 import (
+	gocontext "context"
 	gohttp "net/http"
 	"testing"
 	"time"
@@ -53,6 +54,44 @@ func TestNewHttp(t *testing.T) {
 			go server.Run()
 			time.Sleep(1 * time.Second)
 			server.Stop()
+		})
+	}
+}
+
+func TestStartAndStop(t *testing.T) {
+	type args struct {
+		opts []Options
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "TestStartAndStop",
+			args: args{
+				opts: []Options{
+					WithAddr(":8081"),
+				},
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			server := NewHTTP(tt.args.opts...)
+			server.AddRoute(TestRoute{})
+			err := server.OnStart(gocontext.Background())
+			if err != nil && !tt.wantErr {
+				t.Errorf("Start() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			time.Sleep(1 * time.Second)
+			err = server.OnStop(gocontext.Background())
+			if err != nil && !tt.wantErr {
+				t.Errorf("Stop() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
 		})
 	}
 }
