@@ -23,6 +23,10 @@ type dcomOption struct {
 	ctx util.Context
 }
 
+var defaultDComOption = dcomOption{
+	ctx: util.NewContext(),
+}
+
 func WithContext(ctx util.Context) Options {
 	return withContextOption{
 		ctx: ctx,
@@ -38,16 +42,13 @@ func (context withContextOption) apply(d *dcomOption) {
 }
 
 func NewDCom(opt ...Options) DCom {
-	var dcomOption dcomOption
 	for _, o := range opt {
-		o.apply(&dcomOption)
-	}
-	if dcomOption.ctx == nil {
-		dcomOption.ctx = util.NewContext()
+		o.apply(&defaultDComOption)
 	}
 
-	container := util.NewDIContainer(dcomOption.ctx)
-	container.AddInstance(dcomOption.ctx)
+	container := util.NewDIContainer(defaultDComOption.ctx)
+	container.AddInstance(defaultDComOption.ctx)
+	container.Add(util.NewZapLogger)
 
 	return &dcom{
 		container: container,
