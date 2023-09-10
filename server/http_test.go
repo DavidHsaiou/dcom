@@ -6,8 +6,15 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"github.com/DavidHsaiou/dcom/dto"
+	"github.com/DavidHsaiou/dcom/util"
 )
+
+var testServerAddr = "localhost:8081"
+var testServerUrl = "http://" + testServerAddr
 
 type TestRoute struct {
 }
@@ -41,7 +48,7 @@ func TestNewHttp(t *testing.T) {
 			name: "TestNewHttp",
 			args: args{
 				opts: []Options{
-					WithAddr(":8081"),
+					WithAddr(testServerAddr),
 				},
 			},
 			wantErr: false,
@@ -50,9 +57,15 @@ func TestNewHttp(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			server := NewHTTP(tt.args.opts...)
-			server.AddRoute(TestRoute{})
+			server.AddRoute(new(TestRoute))
 			go server.Run()
 			time.Sleep(1 * time.Second)
+			resp, err := util.NewHttpClient().Get(testServerUrl)
+			if err != nil && !tt.wantErr {
+				require.NoError(t, err)
+			}
+			util.DefaultLogger.Info(resp)
+			assert.NotEmptyf(t, resp, "resp should not be empty")
 			server.Stop()
 		})
 	}
@@ -71,7 +84,7 @@ func TestStartAndStop(t *testing.T) {
 			name: "TestStartAndStop",
 			args: args{
 				opts: []Options{
-					WithAddr(":8081"),
+					WithAddr(testServerAddr),
 				},
 			},
 			wantErr: false,

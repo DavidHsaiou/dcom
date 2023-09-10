@@ -21,6 +21,8 @@ type zapLogger struct {
 	logger *zap.Logger
 }
 
+var DefaultLogger = NewZapLogger()
+
 func NewZapLogger() Logger {
 	logger, err := zap.NewProduction()
 	if err != nil {
