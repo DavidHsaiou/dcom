@@ -54,7 +54,7 @@ func NewDCom(opt ...Options) DCom {
 	}
 }
 
-func (d *dcom) AddService(service any) {
+func (d *dcom) AddService(_ any) {
 }
 
 func (d *dcom) Execute(execution any) {
